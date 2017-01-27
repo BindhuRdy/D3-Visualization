@@ -1,0 +1,7 @@
+display: block, inline, inline-block, table
+
+position: -static, fixed = window +- delta, relative static+-, absolute(imp) = nearest static ancestor+- delta(if no nonstatic member exists then refers to body)
+              |       |
+document flow order   
+
+

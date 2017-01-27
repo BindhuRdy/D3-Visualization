@@ -1,0 +1,152 @@
+from sklearn import decomposition
+from sklearn.decomposition import PCA
+from matplotlib import pyplot
+import sklearn.cluster as cluster
+import pandas
+import random
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn import manifold
+from sklearn.metrics import euclidean_distances
+from sklearn.metrics import pairwise_distances
+from scipy.spatial.distance import cosine
+from flask import Flask
+from flask import render_template
+
+import json
+from pymongo import MongoClient
+import json
+from bson import json_util
+from bson.json_util import dumps
+ 
+app = Flask(__name__)
+
+MONGODB_HOST = 'localhost'
+MONGODB_PORT = 27017
+DBS_NAME = 'donorschoose'
+COLLECTION_NAME = 'projects'
+FIELDS = {'school_state': True, 'resource_type': True, 'poverty_level': True, 'date_posted': True, 'total_donations': True, '_id': False}
+
+
+@app.route("/")
+def index():
+     return render_template("index.html")
+
+
+@app.route("/donorschoose/projects")
+def donorschoose_projects():
+     connection = MongoClient(MONGODB_HOST, MONGODB_PORT)
+     collection = connection[DBS_NAME][COLLECTION_NAME]
+     projects = collection.find(projection=FIELDS, limit=100000)
+     #projects = collection.find(projection=FIELDS)
+     json_projects = []
+     for project in projects:
+         json_projects.append(project)
+     json_projects = json.dumps(json_projects, default=json_util.default)
+     connection.close()
+     return json_projects
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0',port=5000,debug=True)
+
+def DoRandomSampling(data, size):
+    #randomIndexes = random.sample(range(len(data)), length)
+    #return data[data.columns[0] in randomIndexes]
+	sample = data.sample(n=size)
+	return sample
+
+def DoAdaptiveSampling(data, size):
+    number_of_clusters = 8
+    kmeans = cluster.KMeans(n_clusters=number_of_clusters)
+    kfit = kmeans.fit(data)
+    labels = kmeans.labels_
+    print(labels)
+    sample = data[0:0]
+    print("data length:")
+    print(len(data))
+    for index in range(number_of_clusters):
+        clusterdata = data[labels==index]
+        print("length:")
+        print(len(clusterdata))
+        samplestocollect = int((len(clusterdata)* size /len(data)))
+        if samplestocollect == 0:
+            #take atleast one sample from each cluster
+			#print("in")
+            samplestocollect = 1
+
+        samplefromcluster = clusterdata.sample(samplestocollect)
+        sample = pandas.concat([sample, samplefromcluster])
+    #check if required size sample is obtained otherwise fill it with random records
+    samplelen = len(sample)
+    if samplelen < size:
+       pickrecno = size-samplelen
+       records = data.sample(pickrecno)
+       sample = pandas.concat([sample, records])
+    return sample
+
+
+#read the data
+data = pandas.read_csv('creditcardinfo.csv', sep=',',low_memory=False)
+
+#clean and preprocess the data
+#del data['mpaa']
+#del data['title']
+#del data['budget']
+
+#pick random sample from data
+#print(data.sample(10))
+print("Random Sampling")
+sample = DoRandomSampling(data, 5)
+#print(sample)
+print("Adaptive Sampling")
+apdata  = DoAdaptiveSampling(data, 50)
+print(apdata)
+
+#PCA
+data_PCA= apdata
+pca = decomposition.PCA()
+pca.fit(data_PCA)
+print(pca.explained_variance_)
+plt.plot([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],pca.explained_variance_,'ro')
+#plt.show()
+pca.n_components = 2
+reduced_data = pca.fit_transform(data_PCA)
+print(reduced_data)
+reduced_data.shape
+#Plot the explained variance for visualization and dimension picking
+
+
+#MDS
+data_MDS_Euclidean= apdata
+mds = manifold.MDS()
+mds_euc_data = mds.fit_transform(data_MDS_Euclidean)
+print("MDS using Euclidean Distance")
+print(mds_euc_data)
+#plt.plot(mds_euc_data[0],mds_euc_data[1])
+#plt.show()
+data_MDS_cosine = apdata
+mds = manifold.MDS(dissimilarity="precomputed")
+cosine_dissimilarityMat = 1-pairwise_distances(data_MDS_cosine, metric="cosine")
+mds_cosine_data = mds.fit_transform(cosine_dissimilarityMat)
+print("MDS using Cosine Distance")
+print(mds_cosine_data)
+
+data_MDS_corr = apdata
+mds = manifold.MDS(dissimilarity="precomputed")
+corr_dissimilarityMat = data_MDS_corr.corr()
+#corr_dissimilarityMat = np.corrcoef(data_MDS_corr)
+mds_corr_data = mds.fit_transform(corr_dissimilarityMat)
+print("MDS using Correlation Distance")
+print(mds_corr_data)
+
+#Isomap
+data_Isomap= apdata
+isomap = manifold.Isomap()
+isomap_data = isomap.fit_transform(data_Isomap)
+print("Isomap")
+print(isomap_data)
+
+
+#saving as csv
+a = np.asarray(isomap_data)
+np.savetxt("foo.csv", a, delimiter=",")

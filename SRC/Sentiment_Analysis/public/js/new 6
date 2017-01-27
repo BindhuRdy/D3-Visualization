@@ -1,0 +1,49 @@
+function im=imgLoader(ImagePath)
+ImagePath = 'images/hats.tiff';
+im = imread(ImagePath);
+imshow(im);
+%check if color image
+if size(im,3)==3
+    %convert to gray scale
+    im=rgb2gray(im);
+end    
+%convert to double
+im =im2double(im);
+%normalize to [0,1]
+imshow(im)
+[ pos, scale, orient, desc ] = SIFT(im,4,2,ones(size(im)),0.02,10.0,2);
+[database] = add_descriptors_to_database( im, pos, orient, scale, desc);
+%%rotating about origin by 45 degrees%%
+rotMat = [ 0.7072    0.7072         0
+          -0.7072    0.7072         0
+           0            0           1] 
+%rotation of image about origin by 45 degrees   
+[image_affine,Im]= imWarpAffine(im,rotMat,0);  
+%remove NAN
+image_affine(isnan(image_affine)) = 0;
+imshow(image_affine);
+
+%Extracting Sift features for second
+[ pos_new, scale_new, orient_new, desc_new ] = SIFT(image_affine,4,2,ones(size(image_affine)),0.02,10.0,2);
+%Performing hough transform
+[im_idx trans rot rho idesc inn wght] = hough( database, pos_new, orient_new, scale_new, desc_new);
+%compute max weight and index correspoding to it
+[max_w, index] = max(wght);
+desc_key = idesc{index}; 
+desc_original = inn{index};
+[w, h] = size(desc_key);
+%initialis=zing position matrix original and transformed
+pos_original = zeros(2,w);
+pos_transformed = zeros(2,w);
+%initialis=zing scale matrix transformed
+scale_transformed = zeros(1,w);
+for(i = 1:w)
+    pos_original(1,i) = database.pos(desc_original(i),1);
+    pos_original(2,i) = database.pos(desc_original(i),2);
+    pos_transformed(1,i) = pos_new(desc_key(i),1);
+    pos_transformed(2,i) = pos_new(desc_key(i),2);
+    scale_transformed(1,i) = database.scale(desc_original(i),1); 
+end
+
+
+end

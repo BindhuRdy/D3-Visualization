@@ -1,0 +1,138 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <style>
+
+.node {
+  stroke: #fff;
+  stroke-width: 1px;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+.menu {
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background-color: #4CAF50
+}
+.fetche {
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background-color: gray;
+}
+.logout {
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #0000FF;
+}
+</style>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+        <!-- Place favicon.ico in the root directory -->
+
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+		
+        <script src="js/vendor/modernizr-2.8.3.min.js"></script>
+        <script src="//d3js.org/d3.v3.min.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+        <h3 class="">Data Visualization</h3>
+         <p>Project By:<a href="#">Hima Bindhu</a>, <a href="#">Avdhi</a></p>
+        <div class="site-wrapper">
+
+		 <span id="status"></span>
+						
+				    <button id="logout" style="background-color: #0000FF">Logout</button>
+
+			<div class="cover-container">
+
+			  
+
+			  <div class="inner cover">
+				
+				<p class="lead">
+					<!--
+					  Below we include the Login Button social plugin. This button uses
+					  the JavaScript SDK to present a graphical Login button that triggers
+					  the FB.login() function when clicked.
+					-->
+					
+					<fb:login-button id="fblogin" scope="public_profile,email,user_posts" onlogin="checkLoginState();">
+					</fb:login-button>
+                    
+					
+					<section id="fbdetailsblock">
+
+						
+						
+						<div class="progress">
+							<div class="progress-bar progress-bar-success progress-bar-striped zerowidth" role="progressbar" id="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+							</div>
+						</div>
+												
+						<p class="lead">
+						  <button id="fetcher"  class="fetche">Load my FB feeds</button>
+						</p>
+                        </br>
+                        <button class="menu" id="donut1">Sentiment-Analysis</button>
+                        <button class="menu" id="donut2">Emotion-Analysis</button>
+                        <button class="menu" id="bubble">Likes-vs_Emotions</button>
+                        <button class="menu" id="emoji">MyEmoji</button>
+                        <button class="menu" id="fdg">EmotionTransition</button>
+                        
+                       
+						
+						<ul id="posts" class="list-group" >
+						</ul>
+                         <div id="daterangepicker" >
+                    <p>
+                      <label for="amount">Date range:</label>
+                      <input type="text" id="amount" style="border: 0; color: #f6931f; font-weight: bold;" size="100"/>
+                    </p>
+                     <div id="slider-range"></div>
+                    </div>
+					</section>
+                    
+				</p>
+                   
+ 
+                     
+			  </div>
+
+			  
+
+			</div>
+
+		  </div>
+
+		</div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js">
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
+        <script src="js/plugins.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/main.js"></script>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
+        <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
+        <script src="https://code.jquery.com/ui/1.9.2/jquery-ui.js"></script> 
+
+    </body>
+</html>
